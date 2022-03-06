@@ -16,7 +16,7 @@ class Network:
 
     def setWeightsH(self, weightsH): #loop through each hidden node and append a weight to node's weight list for each input
         weight = 0
-        for i in range(len(self.layerHidden)): 
+        for i in range(len(self.layerHidden.nodes)): 
             for j in range(self.noOfInputs):
                 if not weightsH:
                     self.layerHidden.nodes[i].weights.append(random.random())
@@ -26,7 +26,7 @@ class Network:
     
     def setWeightsO(self, weightsO): #loop through each hidden node and append weight to output node weight list
         weight = 0
-        for i in range(len(self.layerHidden)):
+        for i in range(len(self.layerHidden.nodes)):
             if not weightsO:
                 self.nodeOutput.weights.append(random.random())
             else:
@@ -49,7 +49,7 @@ class Network:
         
         #Update weights and bias for hidden to output node
         for i in range(len(self.nodeOutput.weights)):
-            self.nodeOutput.weights[i] += self.learnRate*outputDelta*self.nodeOuput.output
+            self.nodeOutput.weights[i] += self.learnRate*outputDelta*self.nodeOutput.output
         
         self.nodeOutput.bias += self.learnRate*outputDelta*self.nodeOutput.output
 
@@ -57,13 +57,12 @@ class Network:
         for i in range(len(self.layerHidden.nodes)):
             for j in range(len(self.layerHidden.nodes[i].weights)):
                 self.layerHidden.nodes[i].weights[j] += self.learnRate*hiddenDeltas[i]*self.layerHidden.nodes[i].output
-            self.layerHidden.nodes[i].bias += self.learnRate*hiddenDeltas[i]*self.layerHidden.nodes[i].ouput
+            self.layerHidden.nodes[i].bias += self.learnRate*hiddenDeltas[i]*self.layerHidden.nodes[i].output
 
-    def error(self, correct_output):
+    def raw_error(self, correct_output): #calculate raw error from given output
         return correct_output-self.nodeOutput.output
 
     
-
 class HiddenLayer:
     def __init__(self, no_nodes, bias):
         self.bias = bias if bias else random.random() 
@@ -71,13 +70,13 @@ class HiddenLayer:
         for i in range(no_nodes): #instantiate each node object with same bias
             self.nodes.append(Node(self.bias))
     
-    def output(self):
+    def output(self): #save each nodes output to a list
         o = []
         for n in self.nodes:
             o.append(n.output)
         return o
     
-    def passForward(self, inputs):
+    def forwardPass(self, inputs): #save each activation function output to a list
         o = []
         for n in self.nodes:
             o.append(n.activation(inputs))
@@ -99,7 +98,7 @@ class Node:
     def error(self, correctOutput): #calculate node error 
         return correctOutput-self.output
 
-    def derivative(self, correctOutput):
+    def derivative(self, correctOutput): #calculate 1st derivative of sigmoid function for this node
         return self.output*(1-self.output)
 
 class OutputNode:
@@ -115,11 +114,11 @@ class OutputNode:
         self.output = 1/(1+math.exp(-(total+self.bias))) #use sigmoid function on output node 
         return self.output
     
-    def delta(self, correctOutput):
+    def delta(self, correctOutput): #calculate output delta
         return (correctOutput-self.output)*(self.output*(1-self.output))
     
-nn = Network(2, 2, 1)
+n = Network(2, 5)
 
-for i in range(2094):
-    nn.train([1, 0], [1])
-    print("Epochs " + str(i), nn.error([1]))
+for i in range(20000):
+    n.train([1, 0], 1)
+    print("Epochs " + str(i), n.raw_error(1))
