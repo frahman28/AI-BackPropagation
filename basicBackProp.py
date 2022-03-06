@@ -47,16 +47,21 @@ class Network:
             for i in range(len(self.layerHidden.nodes)):
                 hiddenDeltas[i] = self.layerHidden.nodes[i].derivative(output)*outputDelta*self.nodeOutput.weights[i]
             
-            #Update weights for hidden to output node
+            #Update weights and bias for hidden to output node
             for i in range(len(self.nodeOutput.weights)):
                 self.nodeOutput.weights[i] += self.learnRate*outputDelta*self.nodeOuput.output
+            
+            self.nodeOutput.bias += self.learnRate*outputDelta*self.nodeOutput.output
 
-            #Update weights for input to hidden
+            #Update weights and bias for input to hidden
             for i in range(len(self.layerHidden.nodes)):
                 for j in range(len(self.layerHidden.nodes[i].weights)):
                     self.layerHidden.nodes[i].weights[j] += self.learnRate*hiddenDeltas[i]*self.layerHidden.nodes[i].output
+                self.layerHidden.nodes[i].bias += self.learnRate*hiddenDeltas[i]*self.layerHidden.nodes[i].ouput
 
-        def 
+        def error(self, correct_output):
+            return correct_output-self.nodeOutput.output
+
     
 
 class HiddenLayer:
@@ -72,7 +77,7 @@ class HiddenLayer:
             o.append(n.output)
         return o
     
-    def passForward(self):
+    def passForward(self, inputs):
         o = []
         for n in self.nodes:
             o.append(n.activation(inputs))
@@ -113,4 +118,8 @@ class OutputNode:
     def delta(self, correctOutput):
         return (correctOutput-self.output)*(self.output*(1-self.output))
     
-    def error(self, correctOutput)
+nn = Network(2, 2, 1)
+
+for i in range(2094):
+    nn.train([1, 0], [1])
+    print("Epochs " + str(i), nn.error([1]))
