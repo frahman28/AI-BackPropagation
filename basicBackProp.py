@@ -1,5 +1,7 @@
 import random
 import math
+from matplotlib import pyplot as plt
+import numpy as np
 
 class Network:
     learnRate = 0.1
@@ -59,8 +61,13 @@ class Network:
                 self.layerHidden.nodes[i].weights[j] += self.learnRate*hiddenDeltas[i]*self.layerHidden.nodes[i].output
             self.layerHidden.nodes[i].bias += self.learnRate*hiddenDeltas[i]*self.layerHidden.nodes[i].output
 
-    def raw_error(self, correct_output): #calculate raw error from given output
+    def raw_error(self, inputs, correct_output): #calculate raw error from given output
+        self.forwardPass(inputs)
         return correct_output-self.nodeOutput.output
+    
+    def MSE(self, inputs, correct_output): #calculate error of output node using mean square error method
+        self.forwardPass(inputs)
+        return 0.5*(correct_output-self.nodeOutput.output)**2
 
     
 class HiddenLayer:
@@ -94,9 +101,6 @@ class Node:
             total += self.inputs[i]*self.weights[i]
         self.output = 1/(1+math.exp(-(total+self.bias))) #use sigmoid function to calculate output
         return self.output
-    
-    def error(self, correctOutput): #calculate node error 
-        return correctOutput-self.output
 
     def derivative(self, correctOutput): #calculate 1st derivative of sigmoid function for this node
         return self.output*(1-self.output)
@@ -117,8 +121,22 @@ class OutputNode:
     def delta(self, correctOutput): #calculate output delta
         return (correctOutput-self.output)*(self.output*(1-self.output))
     
-n = Network(2, 5)
+n = Network(2, 2)
+x = []
+y = []
 
-for i in range(20000):
-    n.train([1, 0], 1)
-    print("Epochs " + str(i), n.raw_error(1))
+result = 0
+i = 0
+#for i in range(2094):
+while result != 1:
+    n.train([0.9, 0.1], 1)
+    print("Epochs " + str(i), n.MSE([1, 0], 1))
+    y.append(i)
+    x.append(n.raw_error([1, 0], 1))
+    result = n.nodeOutput.output
+    i += 1
+xp = np.array(x)
+yp = np.array(y)
+
+plt.plot(yp, xp) 
+plt.show()
