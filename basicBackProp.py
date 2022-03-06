@@ -14,53 +14,53 @@ class Network:
         self.setWeightsH(weightsH) #call function to set weights between inputs and hidden layer, set to assigned weights if inputted
         self.setWeightsO(weightsO) #call function to set weights between hidden layer and output node, set to assigned weights if inputted
 
-        def setWeightsH(self, weightsH): #loop through each hidden node and append a weight to node's weight list for each input
-            weight = 0
-            for i in range(len(self.layerH)): 
-                for j in range(self.noOfInputs):
-                    if not weightsH:
-                        self.layerHidden.nodes[i].weights.append(random.random())
-                    else:
-                        self.layerHidden.nodes[i].weights.append(weightsH[weight])
-                    weight += 1
-        
-        def setWeightsO(self, weightsO): #loop through each hidden node and append weight to output node weight list
-            weight = 0
-            for i in range(len(self.layerH)):
-                if not weightsO:
-                    self.nodeOutput.weights.append(random.random())
+    def setWeightsH(self, weightsH): #loop through each hidden node and append a weight to node's weight list for each input
+        weight = 0
+        for i in range(len(self.layerHidden)): 
+            for j in range(self.noOfInputs):
+                if not weightsH:
+                    self.layerHidden.nodes[i].weights.append(random.random())
                 else:
-                    self.nodeOutput.weights.append(weightsO[weight])
+                    self.layerHidden.nodes[i].weights.append(weightsH[weight])
                 weight += 1
+    
+    def setWeightsO(self, weightsO): #loop through each hidden node and append weight to output node weight list
+        weight = 0
+        for i in range(len(self.layerHidden)):
+            if not weightsO:
+                self.nodeOutput.weights.append(random.random())
+            else:
+                self.nodeOutput.weights.append(weightsO[weight])
+            weight += 1
 
-        def forwardPass(self, inputs): #use activation functions to make forward pass through network
-            return self.nodeOutput.activation(self.layerHidden.forwardPass(inputs))
+    def forwardPass(self, inputs): #use activation functions to make forward pass through network
+        return self.nodeOutput.activation(self.layerHidden.forwardPass(inputs))
 
-        def train(self, inputs, output):
-            self.forwardPass(inputs)
+    def train(self, inputs, output):
+        self.forwardPass(inputs)
 
-            #Delta for output node
-            outputDelta = self.nodeOutput.delta(output)
+        #Delta for output node
+        outputDelta = self.nodeOutput.delta(output)
 
-            #Delta for hidden nodes
-            hiddenDeltas = [0]*len(self.layerHidden.nodes)
-            for i in range(len(self.layerHidden.nodes)):
-                hiddenDeltas[i] = self.layerHidden.nodes[i].derivative(output)*outputDelta*self.nodeOutput.weights[i]
-            
-            #Update weights and bias for hidden to output node
-            for i in range(len(self.nodeOutput.weights)):
-                self.nodeOutput.weights[i] += self.learnRate*outputDelta*self.nodeOuput.output
-            
-            self.nodeOutput.bias += self.learnRate*outputDelta*self.nodeOutput.output
+        #Delta for hidden nodes
+        hiddenDeltas = [0]*len(self.layerHidden.nodes)
+        for i in range(len(self.layerHidden.nodes)):
+            hiddenDeltas[i] = self.layerHidden.nodes[i].derivative(output)*outputDelta*self.nodeOutput.weights[i]
+        
+        #Update weights and bias for hidden to output node
+        for i in range(len(self.nodeOutput.weights)):
+            self.nodeOutput.weights[i] += self.learnRate*outputDelta*self.nodeOuput.output
+        
+        self.nodeOutput.bias += self.learnRate*outputDelta*self.nodeOutput.output
 
-            #Update weights and bias for input to hidden
-            for i in range(len(self.layerHidden.nodes)):
-                for j in range(len(self.layerHidden.nodes[i].weights)):
-                    self.layerHidden.nodes[i].weights[j] += self.learnRate*hiddenDeltas[i]*self.layerHidden.nodes[i].output
-                self.layerHidden.nodes[i].bias += self.learnRate*hiddenDeltas[i]*self.layerHidden.nodes[i].ouput
+        #Update weights and bias for input to hidden
+        for i in range(len(self.layerHidden.nodes)):
+            for j in range(len(self.layerHidden.nodes[i].weights)):
+                self.layerHidden.nodes[i].weights[j] += self.learnRate*hiddenDeltas[i]*self.layerHidden.nodes[i].output
+            self.layerHidden.nodes[i].bias += self.learnRate*hiddenDeltas[i]*self.layerHidden.nodes[i].ouput
 
-        def error(self, correct_output):
-            return correct_output-self.nodeOutput.output
+    def error(self, correct_output):
+        return correct_output-self.nodeOutput.output
 
     
 
