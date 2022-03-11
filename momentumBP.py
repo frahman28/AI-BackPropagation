@@ -53,7 +53,7 @@ class Network:
         for i in range(len(self.layerHidden.nodes)):
             hiddenDeltas[i] = self.layerHidden.nodes[i].derivative(output)*outputDelta*self.nodeOutput.weights[i]
         
-        #Update weights and bias for hidden to output node
+        #Update weights and bias for hidden to output node using momentum calculation
         self.nodeOutput.old_weights = self.nodeOutput.weights #Update old weights to be used for change calculation
         for i in range(len(self.nodeOutput.weights)):
             self.nodeOutput.weights[i] += self.learnRate*outputDelta*self.nodeOutput.output + self.nodeOutput.weights_change[i]*0.9
@@ -67,10 +67,10 @@ class Network:
 
         self.nodeOutput.bias_change = self.nodeOutput.bias-self.nodeOutput.old_bias
 
-        #Update weights and bias for input to hidden
+        #Update weights and bias for input to hidden using momentum calculation
         for i in range(len(self.layerHidden.nodes)):
-            self.layerHidden.nodes[i].old_weights = self.layerHidden.nodes[i].weights
-            self.layerHidden.nodes[i].old_bias = self.layerHidden.nodes[i].bias
+            self.layerHidden.nodes[i].old_weights = self.layerHidden.nodes[i].weights #Update old weights to be used for change calculation
+            self.layerHidden.nodes[i].old_bias = self.layerHidden.nodes[i].bias #Update old bias to be used for change calculation
             for j in range(len(self.layerHidden.nodes[i].weights)):
                 self.layerHidden.nodes[i].weights[j] += self.learnRate*hiddenDeltas[i]*self.layerHidden.nodes[i].output + self.layerHidden.nodes[i].weights_change[j]*0.9
             self.layerHidden.nodes[i].bias += self.learnRate*hiddenDeltas[i]*self.layerHidden.nodes[i].output + self.layerHidden.nodes[i].bias_change*0.9
